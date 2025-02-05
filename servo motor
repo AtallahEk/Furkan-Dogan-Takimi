@@ -1,0 +1,30 @@
+import RPi.GPIO as GPIO
+import keyboard
+from time import sleep
+
+# GPIO ayarları
+GPIO.setwarnings(False)
+GPIO.setmode(GPIO.BOARD)
+GPIO.setup(16, GPIO.OUT)
+
+# PWM başlatma
+pwm = GPIO.PWM(16, 50)  # 50Hz frekans
+pwm.start(7.5)  # Servo motoru başlangıçta 0 dereceye ayarla
+
+# Servo hareket fonksiyonu
+def move_servo():
+    pwm.ChangeDutyCycle(5)  # -30 derece (sol)
+    sleep(0.5)
+    pwm.ChangeDutyCycle(10)  # +30 derece (sağ)
+    sleep(0.5)
+    pwm.ChangeDutyCycle(7.5)  # 0 derece (merkez)
+    sleep(0.5)
+
+try:
+    while True:
+        if keyboard.is_pressed("up"):  # Yukarı ok tuşuna basılınca hareket etsin
+            move_servo()
+except KeyboardInterrupt:
+    print("Program sonlandırıldı")
+    pwm.stop()
+    GPIO.cleanup()
