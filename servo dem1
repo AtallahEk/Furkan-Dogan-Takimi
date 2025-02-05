@@ -1,0 +1,56 @@
+import RPi.GPIO as GPIO
+import time
+from pynput import keyboard
+
+# GPIO ayarları
+servo_pin = 18  # Servo motorun bağlı olduğu GPIO pini
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(servo_pin, GPIO.OUT)
+
+# PWM frekansı 50Hz
+pwm = GPIO.PWM(servo_pin, 50)
+pwm.start(0)
+
+# Servo başlangıç açısı (30° - 90° aralığında)
+angle = 60  
+
+def set_angle(angle):
+    """Servo motoru belirli bir açıya ayarlar."""
+    duty = 2 + (angle / 18)  # Dereceyi duty cycle'a çevir
+    GPIO.output(servo_pin, True)
+    pwm.ChangeDutyCycle(duty)
+    time.sleep(0.1)
+    GPIO.output(servo_pin, False)
+    pwm.ChangeDutyCycle(0)
+
+# İlk açıyı belirle
+set_angle(angle)
+
+def on_press(key):
+    """Tuşlara basıldığında servo motoru hareket ettirir."""
+    global angle
+
+    try:
+        if key.char == 'w' and angle < 90:
+            angle += 10
+            set_angle(angle)
+            print(f"Yukarı (Sağa): {angle}°")
+        elif key.char == 's' and angle > 30:
+            angle -= 10
+            set_angle(angle)
+            print(f"Aşağı (Sola): {angle}°")
+
+    except AttributeError:
+        pass  # Özel tuşlar (örneğin Shift) için hata oluşmasını önler
+
+def on_release(key):
+    """ESC tuşuna basılınca programı kapatır."""
+    if key == keyboard.Key.esc:
+        pwm.stop()
+        GPIO.cleanup()
+        print("Çıkış yapılıyor...")
+        return False
+
+# Klavye dinleyicisini başlat
+with keyboard.Listener(on_press=on_press, on_release=on_release) as listener:
+    listener.join()
