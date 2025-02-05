@@ -1,3 +1,12 @@
+Gereksinimler:
+Raspberry Pi
+Servo motor
+RPi.GPIO kütüphanesi
+Keyboard kütüphanesi (pip install keyboard)
+Kod:
+python
+Kopyala
+Düzenle
 import RPi.GPIO as GPIO
 import keyboard
 from time import sleep
@@ -9,22 +18,27 @@ GPIO.setup(16, GPIO.OUT)
 
 # PWM başlatma
 pwm = GPIO.PWM(16, 50)  # 50Hz frekans
-pwm.start(7.5)  # Servo motoru başlangıçta 0 dereceye ayarla
+pwm.start(7.5)  # Servo başlangıç konumu (0 derece)
 
-# Servo hareket fonksiyonu
-def move_servo():
-    pwm.ChangeDutyCycle(5)  # -30 derece (sol)
+# Servo hareket fonksiyonları
+def move_up():
+    pwm.ChangeDutyCycle(5)  # Yukarı hareket (-30 derece)
     sleep(0.5)
-    pwm.ChangeDutyCycle(10)  # +30 derece (sağ)
-    sleep(0.5)
-    pwm.ChangeDutyCycle(7.5)  # 0 derece (merkez)
+
+def move_down():
+    pwm.ChangeDutyCycle(10)  # Aşağı hareket (+30 derece)
     sleep(0.5)
 
 try:
     while True:
-        if keyboard.is_pressed("up"):  # Yukarı ok tuşuna basılınca hareket etsin
-            move_servo()
+        if keyboard.is_pressed("up"):  # Yukarı ok tuşu
+            move_up()
+        elif keyboard.is_pressed("down"):  # Aşağı ok tuşu
+            move_down()
 except KeyboardInterrupt:
     print("Program sonlandırıldı")
     pwm.stop()
     GPIO.cleanup()
+Nasıl Çalışır?
+✅ "Yukarı" ok tuşuna basıldığında, servo yukarı hareket eder (-30°).
+✅ "Aşağı" ok tuşuna b
