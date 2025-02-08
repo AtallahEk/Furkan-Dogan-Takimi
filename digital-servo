@@ -1,0 +1,34 @@
+import RPi.GPIO as GPIO
+import time
+
+servo_pin = 18  # PWM sinyali vereceğimiz GPIO pini (BCM18)
+
+GPIO.setmode(GPIO.BCM)  # Pin numaralandırmasını BCM modunda ayarla
+GPIO.setup(servo_pin, GPIO.OUT)
+
+servo = GPIO.PWM(servo_pin, 50)  # 50Hz frekansında PWM başlat
+servo.start(0)  # Servo motoru başlat
+
+# Açıyı PWM'e çeviren fonksiyon
+def set_servo_angle(angle):
+    duty_cycle = 2 + (angle / 18)  # 0-180 derece için uygun PWM darbe süresi
+    GPIO.output(servo_pin, True)
+    servo.ChangeDutyCycle(duty_cycle)
+    time.sleep(0.5)
+    GPIO.output(servo_pin, False)
+    servo.ChangeDutyCycle(0)  # PWM sinyalini sıfırla (Titremeyi önler)
+    print(f"Servo {angle} dereceye hareket etti.")
+
+try:
+    while True:
+        set_servo_angle(0)
+        time.sleep(1)
+        set_servo_angle(90)
+        time.sleep(1)
+        set_servo_angle(180)
+        time.sleep(1)
+
+except KeyboardInterrupt:
+    print("Servo durduruluyor...")
+    servo.stop()
+    GPIO.cleanup()  # GPIO pinlerini temizle
