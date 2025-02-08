@@ -1,0 +1,45 @@
+Raspberry Pi'de bir servo motoru kontrol etmek için RPi.GPIO veya pigpio kütüphanelerini kullanabilirsin. Daha hassas kontrol için pigpio önerilir. İşte kodunun Python'a çevrilmiş hali:
+
+python
+Kopyala
+Düzenle
+
+import time
+import pigpio
+
+servo_pin = 13  # Servo motorun bağlı olduğu GPIO pini
+pi = pigpio.pi()  # Raspberry Pi ile bağlantıyı başlat
+
+pi.set_servo_pulsewidth(servo_pin, 0)  # Servoyu başlat
+
+def set_angle(angle):
+    pulse_width = 500 + (angle / 180.0) * 2000  # 500-2500µs arasında hesaplama
+    pi.set_servo_pulsewidth(servo_pin, pulse_width)
+
+try:
+    while True:
+        set_angle(0)    # 0 derece
+        time.sleep(1)
+        set_angle(90)   # 90 derece
+        time.sleep(1)
+        set_angle(180)  # 180 derece
+        time.sleep(1)
+except KeyboardInterrupt:
+    pi.set_servo_pulsewidth(servo_pin, 0)  # Servo sinyalini kapat
+    pi.stop()  # pigpio bağlantısını kapat
+
+
+Bu kod, pigpio kütüphanesini kullanarak servo motorunu PWM sinyaliyle kontrol eder. Kullanabilmek için önce Raspberry Pi'de pigpio servisini başlatman gerekiyor:
+
+sh
+Kopyala
+Düzenle
+sudo pigpiod
+Eğer kütüphane yüklü değilse şu komutla yükleyebilirsin:
+
+sh
+Kopyala
+Düzenle
+sudo apt-get install pigpio
+pip install pigpio
+Kodun Raspberry Pi'de sorunsuz çalışması için GPIO bağlantılarını doğru yaptığından emin ol.
