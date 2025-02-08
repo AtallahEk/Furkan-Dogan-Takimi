@@ -1,0 +1,22 @@
+from machine import Pin, PWM
+import time
+
+servo_pin = 13  # Servo motor için PWM çıkışı verecek GPIO pini
+servo = PWM(Pin(servo_pin), freq=50)  # 50Hz PWM frekansı (Servo motorlar için standart)
+
+# Servo açısını ayarlayan fonksiyon
+def set_servo_angle(angle):
+    min_pulse = 1000  # 0 derece için minimum darbe genişliği (1ms)
+    max_pulse = 9000  # 180 derece için maksimum darbe genişliği (2ms)
+    pulse_width = int(min_pulse + (angle / 180) * (max_pulse - min_pulse))
+    servo.duty_u16(pulse_width)  # PWM sinyali gönder
+    print(f"Servo açısı: {angle} derece")
+
+# Servo motoru sırayla hareket ettir
+while True:
+    set_servo_angle(0)   # 0 derece
+    time.sleep(1)
+    set_servo_angle(90)  # 90 derece
+    time.sleep(1)
+    set_servo_angle(180) # 180 derece
+    time.sleep(1)
