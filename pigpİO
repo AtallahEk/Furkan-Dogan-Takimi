@@ -1,0 +1,5 @@
+sudo apt update
+sudo apt install pigpio python3-pigpio -y
+sudo systemctl enable pigpiod
+sudo systemctl start pigpiod
+
