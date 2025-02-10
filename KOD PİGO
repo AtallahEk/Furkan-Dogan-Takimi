@@ -1,0 +1,31 @@
+import pigpio
+import time
+
+servo_pin = 18  # PWM sinyali için kullanılacak GPIO pini
+pi = pigpio.pi()  # pigpio bağlantısını başlat
+
+if not pi.connected:
+    exit()
+
+pi.set_mode(servo_pin, pigpio.OUTPUT)  # GPIO çıkış olarak ayarlandı
+pi.set_PWM_frequency(servo_pin, 50)  # 50Hz PWM frekansı ayarlandı
+
+# Açıyı PWM darbe genişliğine dönüştüren fonksiyon
+def set_servo_angle(angle):
+    pulse_width = int(500 + (angle / 180) * 2000)  # 500µs - 2500µs arasında PWM
+    pi.set_servo_pulsewidth(servo_pin, pulse_width)
+    print(f"Servo {angle} dereceye hareket etti.")
+
+try:
+    while True:
+        set_servo_angle(0)
+        time.sleep(1)
+        set_servo_angle(90)
+        time.sleep(1)
+        set_servo_angle(180)
+        time.sleep(1)
+
+except KeyboardInterrupt:
+    print("Servo durduruluyor...")
+    pi.set_servo_pulsewidth(servo_pin, 0)  # Servo sinyalini sıfırla
+    pi.stop()  # pigpio servisini durdur
